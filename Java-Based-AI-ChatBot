@@ -1,0 +1,186 @@
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.HashMap;
+
+public class ChatBotGUI extends JFrame 
+{
+
+    JPanel chatPanel;       
+    JScrollPane scrollPane; 
+    JTextField inputField;
+    static HashMap<String, String> faq = new HashMap<>();
+
+    public ChatBotGUI() 
+    {
+        setTitle("AI Chatbot");
+        setSize(500, 550);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        
+        chatPanel = new JPanel();
+        chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
+        chatPanel.setBackground(new Color(30, 30, 30));
+
+        scrollPane = new JScrollPane(chatPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        add(scrollPane, BorderLayout.CENTER);
+
+        
+        inputField = new JTextField();
+        inputField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+
+        JButton sendButton = new JButton("Send");
+        sendButton.setBackground(new Color(52, 152, 219));
+        sendButton.setForeground(Color.WHITE);
+        sendButton.setFocusPainted(false);
+        sendButton.addActionListener(e -> sendMessage());
+
+        
+        inputField.addKeyListener(new KeyAdapter()
+         {
+            public void keyPressed(KeyEvent e) 
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) sendMessage();
+            }
+        });
+
+        
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        bottomPanel.setBackground(new Color(45, 45, 45));
+
+        bottomPanel.add(inputField, BorderLayout.CENTER);
+        bottomPanel.add(sendButton, BorderLayout.EAST);
+
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        trainBot();
+        addBotMessage("Hello! I am your AI Chatbot. 😊");
+
+        setVisible(true);
+    }
+
+    
+    static void trainBot() 
+    {
+        faq.put("hello", "Hello! How can I help you?");
+        faq.put("hi", "Hi there! Ask me anything.");
+        faq.put("hey", "Hey! How can I assist you today?");
+        faq.put("good morning", "Good morning! Have a great day.");
+        faq.put("good evening", "Good evening! How may I help you?");
+
+        
+        faq.put("how are you", "I am fine. What about you?");
+        faq.put("who are you", "I am an AI chatbot developed using Java.");
+        faq.put("your name", "My name is Java AI Chatbot.");
+        faq.put("what can you do", "I can answer FAQs and chat with you.");
+
+       
+        faq.put("what is java", "Java is an object-oriented programming language.");
+        faq.put("features of java", "Java is simple, secure, portable, and object-oriented.");
+        faq.put("what is oop", "OOP stands for Object-Oriented Programming.");
+        faq.put("what is class", "A class is a blueprint for creating objects.");
+        faq.put("what is object", "An object is an instance of a class.");
+        faq.put("what is inheritance", "Inheritance allows one class to acquire properties of another.");
+        faq.put("what is polymorphism", "Polymorphism allows methods to behave differently based on objects.");
+        faq.put("what is encapsulation", "Encapsulation binds data and methods into a single unit.");
+        faq.put("what is abstraction", "Abstraction hides implementation details and shows only functionality.");
+
+        
+        faq.put("what is ai", "Artificial Intelligence enables machines to mimic human intelligence.");
+        faq.put("what is chatbot", "A chatbot is a software program that simulates conversation.");
+        faq.put("what is nlp", "NLP stands for Natural Language Processing.");
+
+       
+        faq.put("project help", "Sure! I can help you with your project.");
+        faq.put("exam", "Prepare well and revise concepts regularly.");
+        faq.put("codealpha", "CodeAlpha provides internship opportunities for students.");
+
+        
+        faq.put("bye", "Goodbye! Have a nice day.");
+        faq.put("thank you", "You're welcome! 😊");
+        faq.put("thanks", "Happy to help!");
+    }
+
+    static String getResponse(String input) 
+    {
+        input = input.toLowerCase().trim();
+        for (String key : faq.keySet()) 
+        {
+            if (input.contains(key)) return faq.get(key);
+        }
+        return "Sorry, I didn't understand that.";
+    }
+
+    
+    void sendMessage() 
+    {
+        String userText = inputField.getText();
+        if (userText.isEmpty()) return;
+
+        addUserMessage(userText);
+        addBotMessage(getResponse(userText));
+        inputField.setText("");
+    }
+
+    
+    void addUserMessage(String msg) 
+    {
+        JPanel bubble = createBubble(msg, new Color(52, 152, 219), Color.WHITE, FlowLayout.RIGHT);
+        chatPanel.add(bubble);
+        refreshChat();
+    }
+
+    
+    void addBotMessage(String msg) 
+    {
+        JPanel bubble = createBubble(msg, new Color(39, 174, 96), Color.WHITE, FlowLayout.LEFT);
+        chatPanel.add(bubble);
+        refreshChat();
+    }
+
+    
+    JPanel createBubble(String msg, Color bg, Color fg, int alignment) 
+    {
+        JPanel panel = new JPanel(new FlowLayout(alignment));
+        panel.setBackground(new Color(30, 30, 30));
+
+        JLabel label = new JLabel("<html><p style='width:200px;'>" + msg + "</p></html>");
+        label.setOpaque(true);
+        label.setBackground(bg);
+        label.setForeground(fg);
+        label.setBorder(new EmptyBorder(10, 10, 10, 10));
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        label.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(bg),
+                new EmptyBorder(8, 12, 8, 12)
+        ));
+        label.setBackground(bg);
+        label.setForeground(fg);
+        label.setOpaque(true);
+        label.setMaximumSize(new Dimension(250, Integer.MAX_VALUE));
+
+        panel.add(label);
+        return panel;
+    }
+
+    
+    void refreshChat()
+    {
+        chatPanel.revalidate();
+        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum()));
+    }
+
+    public static void main(String[] args)
+    {
+        new ChatBotGUI();
+    }
+}
